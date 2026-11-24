@@ -1,0 +1,367 @@
+<title>2028 Field Briefs</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Public+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a briefing book. Fixed candidate index on the left, one dossier per candidate on the right; stacks to a picker on phones. */
+:root {
+  --paper: #f6f7f9;
+  --sheet: #ffffff;
+  --ink: #16202b;
+  --muted: #5a6573;
+  --rule: #dce1e8;
+  --tint: #eef1f6;
+  --accent: #1e4fc9;
+  --accent-soft: #e3eafb;
+  --flag: #9a5b00;
+  --flag-soft: #fbf0dc;
+  --ok: #2f7a4b;
+  --bar: #1e4fc9;
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body: "Public Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #0f141b; --sheet: #161d26; --ink: #e6ebf1; --muted: #9aa5b3; --rule: #2a3340; --tint: #1c2531;
+  --accent: #8fb0ff; --accent-soft: #1d2b4a; --flag: #f0b45c; --flag-soft: #33270f; --ok: #6fc290; --bar: #6f96f5;
+  color-scheme: dark } }
+:root[data-theme="dark"] {
+  --paper: #0f141b; --sheet: #161d26; --ink: #e6ebf1; --muted: #9aa5b3; --rule: #2a3340; --tint: #1c2531;
+  --accent: #8fb0ff; --accent-soft: #1d2b4a; --flag: #f0b45c; --flag-soft: #33270f; --ok: #6fc290; --bar: #6f96f5;
+  color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--paper); color: var(--ink); font: 15px/1.55 var(--body); }
+a { color: var(--accent); text-underline-offset: 2px }
+a:focus-visible, button:focus-visible, select:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0 }
+.num, td.n, .mono { font-family: var(--mono); font-variant-numeric: tabular-nums }
+
+.shell { display: grid; grid-template-columns: 260px minmax(0, 1fr); min-height: 100vh;
+  padding-left: max(0px, env(safe-area-inset-left, 0px)); padding-right: max(0px, env(safe-area-inset-right, 0px)) }
+nav.index { position: sticky; top: env(safe-area-inset-top, 0px); align-self: start; height: 100vh; overflow-y: auto;
+  border-right: 1px solid var(--rule); padding-block: 22px; padding-inline: 18px 14px; background: var(--paper) }
+.brand { font: 800 13px/1.2 var(--display); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px }
+.brand-sub { font-size: 12px; color: var(--muted); margin-bottom: 18px }
+nav.index ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px }
+nav.index a { display: grid; grid-template-columns: 1fr auto; gap: 0 8px; padding: 7px 10px; border-radius: 6px; text-decoration: none; color: var(--ink) }
+nav.index a .who { font-weight: 600 }
+nav.index a .role { grid-column: 1 / -1; font-size: 12px; color: var(--muted) }
+nav.index a .amt { font: 12px var(--mono); color: var(--muted); align-self: center }
+nav.index a:hover { background: var(--tint) }
+nav.index a[aria-current="page"] { background: var(--accent-soft) }
+nav.index a[aria-current="page"] .who { color: var(--accent) }
+.picker { display: none }
+
+main { min-width: 0; padding-block: 28px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)) }
+.page { max-width: 1120px; margin: 0 auto; display: grid; gap: 30px }
+header.dossier { display: grid; gap: 10px; padding-bottom: 18px; border-bottom: 2px solid var(--ink) }
+.eyebrow { font: 600 12px/1 var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted) }
+header.dossier h1 { font-size: clamp(30px, 4.4vw, 46px); font-weight: 800; letter-spacing: -.01em; line-height: 1.05 }
+.lede { font-size: 17px; max-width: 70ch; margin: 0 }
+.chips { display: flex; flex-wrap: wrap; gap: 6px }
+.chip { font-size: 12px; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--rule); background: var(--sheet); color: var(--ink); text-decoration: none; white-space: nowrap }
+a.chip:hover { border-color: var(--accent) }
+.chip.flag { background: var(--flag-soft); border-color: transparent; color: var(--flag) }
+.chip.ok { color: var(--ok) }
+
+.figures { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet) }
+.fig { padding: 14px 16px; display: grid; gap: 2px; border-left: 1px solid var(--rule) }
+.fig:first-child { border-left: 0 }
+.fig .k { font-size: 12px; color: var(--muted) }
+.fig .v { font: 600 24px/1.2 var(--mono); font-variant-numeric: tabular-nums }
+.fig .s { font-size: 12px; color: var(--muted) }
+
+section { display: grid; gap: 12px; min-width: 0 }
+section > h2 { font-size: 20px; font-weight: 700; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap }
+section > h2 .count { font: 500 13px var(--body); color: var(--muted) }
+.note { font-size: 13px; color: var(--muted); max-width: 80ch; margin: 0 }
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet) }
+table { border-collapse: collapse; width: 100%; font-size: 13.5px }
+th { text-align: left; font: 600 11.5px/1.3 var(--body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 9px 12px; border-bottom: 1px solid var(--rule); background: var(--tint); white-space: nowrap }
+td { padding: 9px 12px; border-bottom: 1px solid var(--rule); vertical-align: top }
+tr:last-child td { border-bottom: 0 }
+td.n, th.n { text-align: right; white-space: nowrap }
+td .sub { display: block; font-size: 12px; color: var(--muted) }
+td .links { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 12px; margin-top: 3px }
+.status { font-size: 11px; padding: 1px 6px; border-radius: 4px; background: var(--tint); color: var(--muted) }
+.status.Verified { color: var(--ok) }
+.empty { padding: 14px 16px; color: var(--muted); font-size: 14px; border: 1px dashed var(--rule); border-radius: 8px }
+
+.bars { display: grid; gap: 7px; border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); padding: 14px 16px }
+.bar { display: grid; grid-template-columns: minmax(120px, 260px) minmax(0, 1fr) auto; gap: 12px; align-items: center; font-size: 13.5px }
+.bar .track { height: 10px; background: var(--tint); border-radius: 2px; overflow: hidden }
+.bar .fill { height: 100%; background: var(--bar); border-radius: 2px }
+.bar .val { font: 13px var(--mono); font-variant-numeric: tabular-nums; min-width: 9ch; text-align: right }
+.bar .lab .sub { color: var(--muted); font-size: 12px }
+
+details.state { border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); overflow: hidden }
+details.state > summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 54px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 14px; background: var(--tint) }
+details.state > summary::-webkit-details-marker { display: none }
+details.state > summary .code { font: 700 18px var(--display); letter-spacing: .04em }
+details.state > summary .nm { font-weight: 600 }
+details.state > summary .nm .sub { font-weight: 400; color: var(--muted); font-size: 12.5px; margin-left: 6px }
+details.state > summary .tot { font: 600 15px var(--mono) }
+details.state[open] > summary { border-bottom: 1px solid var(--rule) }
+details.state .tablewrap { border: 0; border-radius: 0 }
+.stack { display: grid; gap: 10px }
+.cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px }
+.article { border: 1px solid var(--rule); border-radius: 8px; background: var(--sheet); padding: 14px 16px; display: grid; gap: 6px }
+.article h3 { font-size: 16px; font-weight: 700 }
+.article .meta { font-size: 12.5px; color: var(--muted) }
+.article p { margin: 0; font-size: 14px; max-width: 80ch }
+.gaps { border-left: 3px solid var(--flag); background: var(--flag-soft); padding: 10px 14px; border-radius: 0 8px 8px 0 }
+.gaps ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 14px }
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center }
+.toolbar button { font: 500 13px var(--body); padding: 5px 10px; border-radius: 6px; border: 1px solid var(--rule); background: var(--sheet); color: var(--ink); cursor: pointer }
+.toolbar button:hover { border-color: var(--accent) }
+footer.src { font-size: 12.5px; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 14px; max-width: 90ch }
+.loading { padding: 40px 0; color: var(--muted) }
+
+@media (max-width: 860px) {
+  .shell { grid-template-columns: minmax(0, 1fr) }
+  nav.index { display: none }
+  .picker { display: grid; gap: 6px; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--paper);
+    padding-block: 10px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); border-bottom: 1px solid var(--rule) }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper) }
+  .picker label { font: 800 11px var(--display); letter-spacing: .14em; text-transform: uppercase; color: var(--muted) }
+  .picker select { font: 600 15px var(--body); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--rule); background: var(--sheet); color: var(--ink); width: 100% }
+  .figures { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+  .fig:nth-child(3) { border-left: 0 }
+  .fig:nth-child(n+3) { border-top: 1px solid var(--rule) }
+  .cols { grid-template-columns: minmax(0, 1fr) }
+  .bar { grid-template-columns: minmax(0, 1fr) auto; }
+  .bar .track { grid-column: 1 / -1; grid-row: 2 }
+}
+@media (prefers-reduced-motion: no-preference) { nav.index a, .toolbar button { transition: background .15s, border-color .15s } }
+</style>
+
+<div class="picker">
+  <label for="pick">Candidate brief</label>
+  <select id="pick" aria-label="Choose a candidate"></select>
+</div>
+<div class="shell">
+  <nav class="index" aria-label="Candidates">
+    <div class="brand">2028 Field Briefs</div>
+    <div class="brand-sub" id="asof">FEC data, 2025–26 cycle</div>
+    <ol id="navlist"></ol>
+  </nav>
+  <main><div class="page" id="view"><p class="loading">Loading the briefs…</p></div></main>
+</div>
+
+<script>
+const STATES = {AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",DC:"Washington, DC",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming",PR:"Puerto Rico"};
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const usd = (v, d = 0) => (v < 0 ? "−$" : "$") + Math.abs(v).toLocaleString("en-US", {minimumFractionDigits: d, maximumFractionDigits: d});
+const short = v => { const a = Math.abs(v); return a >= 1e6 ? "$" + (v / 1e6).toFixed(a >= 1e7 ? 1 : 2) + "M" : a >= 1e3 ? "$" + Math.round(v / 1e3) + "K" : usd(v); };
+const mon = d => { if (!d) return ""; const [y, m] = d.split("-"); return ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+m - 1] + " " + y; };
+const span = (a, b, m) => mon(a) === mon(b) ? `${mon(a)} <span class="sub">one month</span>` : `${mon(a)} – ${mon(b)} <span class="sub">${m} months</span>`;
+const title = s => esc(s).replace(/\b([A-Z])([A-Z'&.]+)\b/g, (m, a, b) => m.length <= 3 && !/[AEIOU]/.test(m) ? m : a + b.toLowerCase());
+const ext = (href, text) => href ? `<a href="${esc(href)}" target="_blank" rel="noopener">${text}</a>` : "";
+let DATA = null;
+
+function nav() {
+  const items = [{slug: "overview", name: "Compare the field", role: "All candidates side by side"},
+    {slug: "strategy", name: "Strategy consultants", role: `Strategy & general consulting · ${DATA.strategy.length} consultants`},
+    ...[...DATA.candidates].sort((a, b) => a.name.split(" ").pop().localeCompare(b.name.split(" ").pop()))];
+  document.getElementById("navlist").innerHTML = items.map(c => `<li><a href="#${c.slug}" data-slug="${c.slug}">
+      <span class="who">${esc(c.name)}</span><span class="amt">${c.totals ? short(c.totals.service_spending) : ""}</span>
+      <span class="role">${esc(c.role)}</span></a></li>`).join("");
+  document.getElementById("pick").innerHTML = items.map(c => `<option value="${c.slug}">${esc(c.name)}</option>`).join("");
+  document.getElementById("asof").textContent = "FEC data through " + DATA.data_through;
+}
+
+function figures(c) {
+  const t = c.totals, raisedNote = t.raised_covers.length ? "PAC summary: " + t.raised_covers.join(", ") : "No PAC summary for these committees";
+  return `<div class="figures">
+    <div class="fig"><span class="k">Raised, 2025–26</span><span class="v">${t.raised ? short(t.raised) : "—"}</span><span class="s">${esc(raisedNote)}</span></div>
+    <div class="fig"><span class="k">Cash on hand</span><span class="v">${t.raised ? short(t.cash_on_hand) : "—"}</span><span class="s">${t.raised ? "Latest PAC summary" : "Not in this data"}</span></div>
+    <div class="fig"><span class="k">Itemized spending</span><span class="v">${short(t.itemized_spending)}</span><span class="s">Schedule B, all committees</span></div>
+    <div class="fig"><span class="k">Paid for consulting services</span><span class="v">${short(t.service_spending)}</span><span class="s">${t.consultants} consultants in ${t.states} states</span></div>
+  </div>`;
+}
+
+function lede(c) {
+  const t = c.totals, top = c.consultants_by_state.flatMap(s => s.consultants).sort((a, b) => b.amount - a.amount)[0];
+  const parts = [];
+  const list = a => a.length > 1 ? a.slice(0, -1).join(", ") + " and " + a[a.length - 1] : a[0];
+  if (t.raised) parts.push(`${list(t.raised_covers)} raised ${short(t.raised)} in 2025–26 and had ${short(t.cash_on_hand)} on hand.`);
+  if (t.consultants) parts.push(`${c.name === "Alexandria Ocasio-Cortez" ? "Ocasio-Cortez" : c.name.split(" ").pop()}'s committees paid ${t.consultants} consultants and service firms ${short(t.service_spending)} for services; the largest is ${title(top.name)} (${short(top.amount)}).`);
+  else parts.push("No consulting payments have been reported yet.");
+  const st = c.consultants_by_state.slice(0, 3).map(s => STATES[s.state] || s.state);
+  if (st.length) parts.push(`The largest amounts went to consultants in ${list(st)}.`);
+  return parts.join(" ");
+}
+
+function committeesTable(c) {
+  return `<section><h2>Committees <span class="count">${c.committees.length}</span></h2>
+  <div class="tablewrap"><table><thead><tr><th>Committee</th><th>Type</th><th>Treasurer</th><th class="n">Raised</th><th class="n">Spent</th><th class="n">Cash on hand</th><th>Data</th></tr></thead><tbody>
+  ${c.committees.map(x => `<tr>
+    <td>${ext(x.fec_url, esc(x.name))} <span class="sub mono">${x.id}</span>
+      <span class="links">${x.website ? ext(x.website, "Website") : ""}</span>${x.note ? `<span class="sub">${esc(x.note)}</span>` : ""}</td>
+    <td>${esc(x.type)}<span class="sub">${esc(x.address)}</span></td>
+    <td>${esc(x.treasurer)}</td>
+    <td class="n">${x.summary ? usd(x.summary.receipts) : "—"}</td>
+    <td class="n">${x.summary ? usd(x.summary.disbursements) : usd(x.itemized_spending)}${x.summary ? "" : '<span class="sub">itemized only</span>'}</td>
+    <td class="n">${x.summary ? usd(x.summary.cash_end) : "—"}${x.summary ? `<span class="sub">to ${esc(x.summary.through)}</span>` : ""}</td>
+    <td><div class="chips">${x.has_schedule_b ? '<span class="chip ok">Spending</span>' : '<span class="chip flag">No spending data</span>'}${x.has_schedule_a ? '<span class="chip ok">Donors</span>' : '<span class="chip flag">No donor data</span>'}</div></td>
+  </tr>`).join("")}</tbody></table></div></section>`;
+}
+
+function servicesBars(c) {
+  if (!c.services.length) return "";
+  const max = c.services[0].amount;
+  return `<section><h2>Consulting services <span class="count">by amount paid</span></h2>
+  <div class="bars">${c.services.map(s => `<div class="bar"><span class="lab">${esc(s.category)} <span class="sub">${s.payees} ${s.payees === 1 ? "payee" : "payees"}</span></span>
+    <span class="track"><span class="fill" style="width:${Math.max(0.6, s.amount / max * 100).toFixed(1)}%"></span></span><span class="val">${short(s.amount)}</span></div>`).join("")}</div></section>`;
+}
+
+function consultants(c) {
+  if (!c.consultants_by_state.length) return `<section><h2>Consultants by state</h2><div class="empty">No consulting payments reported yet.</div></section>`;
+  const open = c.consultants_by_state.length <= 6;
+  return `<section id="by-state"><h2>Consultants by state <span class="count">${c.totals.consultants} consultants · ${c.totals.states} states · ${short(c.totals.consultant_spending)} paid in total</span></h2>
+  <p class="note">Grouped by the state on each payment, so a firm paid at two addresses appears under both. "Paid" is every payment to the firm, including reimbursements; the services listed are the ones the filings describe. Time with the committee runs from the first to the last payment.</p>
+  <div class="toolbar"><button type="button" data-act="open">Expand all states</button><button type="button" data-act="close">Collapse all</button></div>
+  <div class="stack">${c.consultants_by_state.map((s, i) => `<details class="state" ${open || i < 3 ? "open" : ""}>
+    <summary><span class="code">${esc(s.state)}</span><span class="nm">${esc(STATES[s.state] || s.state)}<span class="sub">${s.consultants.length} ${s.consultants.length === 1 ? "consultant" : "consultants"}</span></span><span class="tot">${usd(s.amount)}</span></summary>
+    <div class="tablewrap"><table><thead><tr><th>Consultant</th><th>Services</th><th class="n">Paid</th><th>Time with committee</th><th>Paid by</th><th>Also works for</th></tr></thead><tbody>
+    ${s.consultants.map(x => `<tr>
+      <td><strong>${title(x.name)}</strong><span class="sub">${esc(x.city)}${x.individual ? " · individual" : ""}</span>${x.principals ? `<span class="sub">Principal: ${esc(x.principals)}</span>` : ""}
+        <span class="links">${x.website ? ext(x.website, "Website") + ` <span class="status ${esc(x.website_status)}">${esc(x.website_status)}</span>` : ""}${ext(x.linkedin, x.linkedin_confirmed ? "LinkedIn profile" : "LinkedIn search")}</span></td>
+      <td>${x.services.map(esc).join("<br>") || '<span class="sub">Non-service payments only</span>'}</td>
+      <td class="n">${usd(x.amount)}<span class="sub">${x.payments} ${x.payments === 1 ? "payment" : "payments"}</span></td>
+      <td>${span(x.first, x.last, x.months)}</td>
+      <td>${x.committees.map(k => `${esc(k.name)} <span class="sub">${usd(k.amount)} · ${ext(k.fec_payments, "FEC records")}</span>`).join("")}</td>
+      <td>${x.also_works_for.length ? `<div class="chips">${x.also_works_for.map(n => `<a class="chip" href="#${DATA.candidates.find(z => z.name === n).slug}">${esc(n)}</a>`).join("")}</div>` : '<span class="sub">—</span>'}</td>
+    </tr>`).join("")}</tbody></table></div></details>`).join("")}</div></section>`;
+}
+
+function people(c) {
+  const rows = c.people.map(p => `<tr><td><strong>${esc(p.name)}</strong><span class="links">${ext(p.linkedin, "LinkedIn search")}</span></td><td>${esc(p.role)}</td><td>${esc(p.organization)}</td><td>${p.sources.map(esc).join("<br>")}</td></tr>`).join("");
+  return `<section><h2>People <span class="count">named in articles, plus FEC treasurers</span></h2>
+  ${rows ? `<div class="tablewrap"><table><thead><tr><th>Name</th><th>Title or role</th><th>Organization</th><th>Source</th></tr></thead><tbody>${rows}</tbody></table></div>` : '<div class="empty">No people identified yet.</div>'}
+  <p class="note">Titles are as reported in the source. LinkedIn links open a LinkedIn search for the name; they aren't confirmed profiles.</p></section>`;
+}
+
+function staff(c) {
+  if (!c.staff.length) return "";
+  return `<section><h2>Paid staff <span class="count">${c.staff_count} people on payroll${c.staff_count > c.staff.length ? `, top ${c.staff.length} shown` : ""}</span></h2>
+  <p class="note">From salary and payroll payments, most itemized under the committee's payroll provider. The FEC doesn't record job titles.</p>
+  <div class="tablewrap"><table><thead><tr><th>Name</th><th>Committee</th><th class="n">Paid</th><th>Period</th></tr></thead><tbody>
+  ${c.staff.map(s => `<tr><td><strong>${esc(s.name)}</strong><span class="links">${ext(s.linkedin, "LinkedIn search")}</span></td><td>${s.committees.map(esc).join(", ")}</td><td class="n">${usd(s.amount)}<span class="sub">${s.payments} payments</span></td><td>${span(s.first, s.last, (() => { const [a, b] = [s.first, s.last].map(d => d.split("-").map(Number)); return (b[0] - a[0]) * 12 + b[1] - a[1] + 1; })())}</td></tr>`).join("")}
+  </tbody></table></div></section>`;
+}
+
+function donors(c) {
+  const d = c.donors;
+  if (!d) return `<section><h2>Donors</h2><div class="empty">No itemized receipts (Schedule A) for these committees in the data yet.</div></section>`;
+  const max = d.top_states.length ? d.top_states[0].amount : 1;
+  return `<section><h2>Donors <span class="count">${d.individual_donors.toLocaleString()} itemized individual donors · ${short(d.individual_total)}</span></h2>
+  <p class="note">Itemized contributions only (over $200 a year), excluding memo copies of joint-fundraising and conduit transfers. Small-dollar money isn't itemized.</p>
+  <div class="cols">
+    <div class="bars">${d.top_states.map(s => `<div class="bar"><span class="lab">${esc(STATES[s.state] || s.state)} <span class="sub">${Math.round(s.share * 100)}%</span></span><span class="track"><span class="fill" style="width:${(s.amount / max * 100).toFixed(1)}%"></span></span><span class="val">${short(s.amount)}</span></div>`).join("")}</div>
+    <div class="tablewrap"><table><thead><tr><th>Top employers of donors</th><th class="n">Given</th></tr></thead><tbody>${d.top_employers.map(e => `<tr><td>${esc(e.employer)}</td><td class="n">${usd(e.amount)}</td></tr>`).join("") || '<tr><td colspan="2">None listed</td></tr>'}</tbody></table></div>
+  </div>
+  <div class="cols">
+    <div class="tablewrap"><table><thead><tr><th>Largest individual donors</th><th class="n">Given</th></tr></thead><tbody>${d.top_individuals.map(p => `<tr><td><strong>${esc(p.name)}</strong><span class="sub">${esc(p.place)}${p.occupation ? " · " + title(p.occupation) : ""}${p.employer && !/^(NOT EMPLOYED|NONE|RETIRED|SELF)/i.test(p.employer) ? ", " + title(p.employer) : ""}</span></td><td class="n">${usd(p.amount)}</td></tr>`).join("")}</tbody></table></div>
+    <div class="tablewrap"><table><thead><tr><th>Largest PACs and organizations</th><th class="n">Given</th></tr></thead><tbody>${d.top_orgs.map(o => `<tr><td>${title(o.name)}<span class="sub">${esc(o.type)}</span></td><td class="n">${usd(o.amount)}</td></tr>`).join("") || '<tr><td colspan="2">None</td></tr>'}</tbody></table></div>
+  </div></section>`;
+}
+
+function money(c) {
+  const k = c.contributions, e = c.early_states;
+  return `<section><h2>Political giving and early-state footprint</h2>
+  <div class="cols">
+    <div class="stack"><p class="note">Contributions to candidates, parties and committees: <strong>${usd(k.total)}</strong> to ${k.count} recipients.</p>
+      ${k.top.length ? `<div class="tablewrap"><table><thead><tr><th>Recipient</th><th>State</th><th class="n">Given</th></tr></thead><tbody>${k.top.map(x => `<tr><td>${title(x.recipient)}</td><td>${esc(x.state)}</td><td class="n">${usd(x.amount)}</td></tr>`).join("")}</tbody></table></div>` : '<div class="empty">No contributions reported.</div>'}</div>
+    <div class="stack"><p class="note">All itemized spending in early primary states (Iowa, New Hampshire, South Carolina, Nevada, Michigan).</p>
+      ${e.length ? `<div class="tablewrap"><table><thead><tr><th>State</th><th class="n">Spent</th><th>Largest payees</th></tr></thead><tbody>${e.map(x => `<tr><td><strong>${esc(STATES[x.state])}</strong><span class="sub">${x.payments} payments</span></td><td class="n">${usd(x.amount)}</td><td>${x.top.map(t => `${title(t.payee)} <span class="sub">${usd(t.amount)}</span>`).join("")}</td></tr>`).join("")}</tbody></table></div>` : '<div class="empty">No itemized spending in these states.</div>'}</div>
+  </div></section>`;
+}
+
+function articles(c) {
+  return `<section><h2>Reporting <span class="count">${c.articles.length} saved ${c.articles.length === 1 ? "source" : "sources"}</span></h2>
+  ${c.articles.length ? `<div class="stack">${c.articles.map(a => `<article class="article"><h3>${a.url ? ext(a.url, esc(a.title)) : esc(a.title)}</h3>
+    <div class="meta">${esc(a.outlet)}${a.author ? " · " + esc(a.author) : ""}${a.date ? " · " + esc(a.date) : ""}</div><p>${esc(a.summary)}</p></article>`).join("")}</div>` : '<div class="empty">No articles saved for this candidate yet. Add them to data/articles and the index.</div>'}</section>`;
+}
+
+function gaps(c) {
+  return c.gaps.length ? `<section><h2>Gaps in this brief</h2><div class="gaps"><ul>${c.gaps.map(g => `<li>${esc(g)}</li>`).join("")}</ul></div></section>` : "";
+}
+
+function brief(c) {
+  return `<header class="dossier"><span class="eyebrow">Candidate brief · ${esc(c.role)}</span><h1>${esc(c.name)}</h1>
+    <p class="lede">${esc(lede(c))}</p>
+    <div class="chips">${c.committees.map(x => `<a class="chip" href="${esc(x.fec_url)}" target="_blank" rel="noopener">${esc(x.name)}</a>`).join("")}</div></header>
+  ${figures(c)}${committeesTable(c)}${servicesBars(c)}${consultants(c)}${people(c)}${staff(c)}${donors(c)}${money(c)}${articles(c)}${gaps(c)}${footer()}`;
+}
+
+function overview() {
+  const C = DATA.candidates;
+  const owners = {};
+  C.forEach(c => c.consultants_by_state.forEach(s => s.consultants.forEach(x => {
+    (owners[x.name] ||= {name: x.name, cands: new Map(), services: new Set()});
+    owners[x.name].cands.set(c.name, (owners[x.name].cands.get(c.name) || 0) + x.amount);
+    x.services.forEach(v => owners[x.name].services.add(v));
+  })));
+  const shared = Object.values(owners).filter(o => o.cands.size > 1)
+    .map(o => ({...o, total: [...o.cands.values()].reduce((a, b) => a + b, 0)})).sort((a, b) => b.cands.size - a.cands.size || b.total - a.total);
+  return `<header class="dossier"><span class="eyebrow">Briefing book · ${C.length} possible 2028 Democratic candidates</span><h1>Compare the field</h1>
+    <p class="lede">Money, consultants and teams behind each candidate's federal committees, from FEC filings for the 2025–26 cycle and saved reporting. Pick a candidate for the full brief.</p></header>
+  <section><h2>At a glance</h2><div class="tablewrap"><table><thead><tr><th>Candidate</th><th class="n">Raised (PACs)</th><th class="n">Cash on hand</th><th class="n">Itemized spending</th><th class="n">Consulting services</th><th class="n">Consultants</th><th class="n">States</th><th>Largest consultant</th></tr></thead><tbody>
+  ${C.map(c => { const top = c.consultants_by_state.flatMap(s => s.consultants).sort((a, b) => b.amount - a.amount)[0];
+    return `<tr><td><a href="#${c.slug}"><strong>${esc(c.name)}</strong></a><span class="sub">${esc(c.role)}</span></td><td class="n">${c.totals.raised ? usd(c.totals.raised) : "—"}</td><td class="n">${c.totals.raised ? usd(c.totals.cash_on_hand) : "—"}</td><td class="n">${usd(c.totals.itemized_spending)}</td><td class="n">${usd(c.totals.service_spending)}</td><td class="n">${c.totals.consultants}</td><td class="n">${c.totals.states}</td><td>${top ? `${title(top.name)}<span class="sub">${short(top.amount)}</span>` : '<span class="sub">—</span>'}</td></tr>`; }).join("")}
+  </tbody></table></div><p class="note">"Raised" and "cash on hand" come from the FEC PAC summary file, which doesn't cover Senate campaign committees (Ossoff, Kelly, Booker for Senate). Senate campaign spending includes 2026 reelection costs.</p></section>
+  <section><h2>Consultants shared across candidates <span class="count">${shared.length}</span></h2>
+  <div class="tablewrap"><table><thead><tr><th>Consultant</th><th>Services</th><th>Candidates (amount paid)</th></tr></thead><tbody>
+  ${shared.map(o => `<tr><td><strong>${title(o.name)}</strong></td><td>${[...o.services].slice(0, 3).map(esc).join("<br>")}</td><td><div class="chips">${[...o.cands.entries()].sort((a, b) => b[1] - a[1]).map(([n, v]) => `<a class="chip" href="#${C.find(z => z.name === n).slug}">${esc(n)} · ${short(v)}</a>`).join("")}</div></td></tr>`).join("")}
+  </tbody></table></div></section>${footer()}`;
+}
+
+function strategyPage() {
+  const S = DATA.strategy, total = S.reduce((a, x) => a + x.amount, 0);
+  const cands = new Set(S.flatMap(x => x.engagements.map(e => e.candidate)));
+  return `<header class="dossier"><span class="eyebrow">Across all candidates · Strategy & general consulting</span><h1>Strategy consultants</h1>
+    <p class="lede">${S.length} firms and individuals were paid ${short(total)} for strategy or general consulting by the committees of ${cands.size} candidates. Amounts count only payments the filings describe this way.</p></header>
+  <section><h2>All strategy and general consultants <span class="count">${S.length}</span></h2>
+  <p class="note">Sorted by amount paid for strategy or general consulting. Payments described as reimbursements or other services are left out of the amount; any other services the consultant provides are listed. "LinkedIn profile" is a confirmed profile; "LinkedIn search" opens a name search.</p>
+  <div class="tablewrap"><table><thead><tr><th>Consultant</th><th>Candidate and committee</th><th class="n">Paid for strategy</th><th>Time with committee</th><th>Described in filings as</th><th>Other services</th></tr></thead><tbody>
+  ${S.map(x => `<tr>
+    <td><strong>${title(x.name)}</strong><span class="sub">${esc(x.place)}${x.individual ? " · individual" : ""}</span>${x.principals ? `<span class="sub">Principal: ${esc(x.principals)}</span>` : ""}
+      <span class="links">${x.website ? ext(x.website, "Website") + ` <span class="status ${esc(x.website_status)}">${esc(x.website_status)}</span>` : ""}${ext(x.linkedin, x.linkedin_confirmed ? "LinkedIn profile" : "LinkedIn search")}</span></td>
+    <td>${x.engagements.map(e => `<a href="#${e.slug}">${esc(e.candidate)}</a><span class="sub">${esc(e.committee)} · ${usd(e.amount)} · ${ext(e.fec_payments, "FEC records")}</span>`).join("")}</td>
+    <td class="n">${usd(x.amount)}<span class="sub">${x.payments} ${x.payments === 1 ? "payment" : "payments"}</span></td>
+    <td>${span(x.first, x.last, x.months)}</td>
+    <td>${x.descriptions.map(d => esc(d.charAt(0) + d.slice(1).toLowerCase())).join("<br>")}</td>
+    <td>${x.other_services.length ? x.other_services.map(esc).join("<br>") : '<span class="sub">—</span>'}</td>
+  </tr>`).join("")}</tbody></table></div></section>${footer()}`;
+}
+
+function footer() {
+  return `<footer class="src">Sources: FEC Schedule A and B itemized filings, the FEC PAC summary and committee master files (2025–26 cycle, data through ${esc(DATA.data_through)}), and saved news articles. Consultants are payees with at least one payment the filings describe as a consulting or professional political service. Websites were checked on 24 Nov 2026 ("Verified" means the site identifies the firm; "Likely" means the domain matches but the page couldn't be read). Built ${esc(DATA.generated)}.</footer>`;
+}
+
+function show() {
+  const slug = (location.hash || "#overview").slice(1);
+  const c = DATA.candidates.find(x => x.slug === slug);
+  const view = document.getElementById("view");
+  view.innerHTML = c ? brief(c) : slug === "strategy" ? strategyPage() : overview();
+  const cur = c ? c.slug : slug === "strategy" ? "strategy" : "overview";
+  document.querySelectorAll("#navlist a").forEach(a => { if (a.dataset.slug === cur) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+  document.getElementById("pick").value = cur;
+  document.title = (c ? c.name + " · " : cur === "strategy" ? "Strategy consultants · " : "") + "2028 Field Briefs";
+  window.scrollTo(0, 0);
+}
+
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-act]");
+  if (!b) return;
+  document.querySelectorAll("details.state").forEach(d => d.open = b.dataset.act === "open");
+});
+document.getElementById("pick").addEventListener("change", e => { location.hash = e.target.value; });
+window.addEventListener("hashchange", show);
+
+fetch("briefs.json").then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+  .then(d => { DATA = d; nav(); show(); })
+  .catch(() => { document.getElementById("view").innerHTML = '<div class="empty">The brief data (briefs.json) didn\'t load. Reload the page; if it persists, the data file is missing from this artifact.</div>'; });
+</script>

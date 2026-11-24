@@ -1,0 +1,454 @@
+<title>Illinois PAC Consultants</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: a filing-ledger page. Sticky section nav, summary first, then who-hired-whom, consultant cards, monthly timeline, and the full searchable payment ledger. */
+:root{
+  --bg:#f5f7f9; --surface:#ffffff; --surface-2:#eef2f5; --fg:#16202a; --muted:#5b6876; --line:#d8dfe6;
+  --accent:#1f4f8f; --accent-soft:#e3ecf8; --flag:#9a5b00; --flag-bg:#fdf1dc;
+  --pac-newsom:#0e7a77; --pac-whitmer:#b8730f; --pac-buttigieg:#3557c8; --pac-moore:#8a3f8f; --pac-ossoff:#2f7d32; --pac-booker:#b3364a; --pac-kelly:#5c6b7a;
+  --display:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f151b; --surface:#161e26; --surface-2:#1d2731; --fg:#e4eaf0; --muted:#97a5b3; --line:#2b3743;
+  --accent:#8fb4ee; --accent-soft:#1c2c42; --flag:#f0b85a; --flag-bg:#33280f;
+  --pac-newsom:#3fc2bd; --pac-whitmer:#e9a743; --pac-buttigieg:#7f9cf5; --pac-moore:#cf86d3; --pac-ossoff:#6cc070; --pac-booker:#f07c8e; --pac-kelly:#a9b8c8; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f151b; --surface:#161e26; --surface-2:#1d2731; --fg:#e4eaf0; --muted:#97a5b3; --line:#2b3743;
+  --accent:#8fb4ee; --accent-soft:#1c2c42; --flag:#f0b85a; --flag-bg:#33280f;
+  --pac-newsom:#3fc2bd; --pac-whitmer:#e9a743; --pac-buttigieg:#7f9cf5; --pac-moore:#cf86d3; --pac-ossoff:#6cc070; --pac-booker:#f07c8e; --pac-kelly:#a9b8c8; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:clamp(1.9rem,4.5vw,2.8rem);font-weight:700;letter-spacing:-.01em}
+h2{font-size:1.55rem;font-weight:600}
+h3{font-size:1.1rem;font-weight:600}
+p{margin:0}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+
+header.top{background:var(--surface);border-bottom:1px solid var(--line)}
+header.top .wrap{padding-block:28px 22px;display:grid;gap:10px}
+.lede{color:var(--muted);max-width:68ch}
+.meta-row{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:.85rem;color:var(--muted)}
+.meta-row span b{color:var(--fg);font-weight:500}
+
+nav.sections{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+nav.sections .wrap{display:flex;gap:4px;overflow-x:auto;padding-block:8px;scrollbar-width:none}
+nav.sections a{flex:none;text-decoration:none;color:var(--muted);font-size:.88rem;font-weight:500;padding:6px 12px;border-radius:999px}
+nav.sections a:hover{color:var(--fg);background:var(--surface-2)}
+nav.sections a.on{color:var(--accent);background:var(--accent-soft)}
+
+main .wrap{display:grid;gap:56px;padding-block:36px 72px}
+section{display:grid;gap:18px;scroll-margin-top:64px;min-width:0}
+.sec-head{display:grid;gap:4px}
+.sec-head p{color:var(--muted);max-width:70ch}
+
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:grid;gap:4px}
+.tile .v{font-family:var(--display);font-size:2rem;font-weight:600;font-variant-numeric:tabular-nums}
+.tile .s{font-size:.82rem;color:var(--muted)}
+@media (max-width:760px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.legend{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 11px 4px 8px;font-size:.82rem;cursor:pointer;color:var(--fg);font-family:inherit}
+.chip:hover{border-color:var(--muted)}
+.chip[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+
+.split{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:20px;align-items:start}
+@media (max-width:860px){.split{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;min-width:0}
+.bars{display:grid;gap:12px}
+.bar-row{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr) auto;gap:12px;align-items:center;background:none;border:0;padding:0;text-align:left;color:inherit;font:inherit;cursor:pointer}
+.bar-row .name{font-size:.88rem;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track{height:14px;background:var(--surface-2);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;min-width:2px}
+.bar-row .amt{font-size:.85rem}
+.bar-row:hover .name{color:var(--accent)}
+@media (max-width:520px){.bar-row{grid-template-columns:1fr auto}.bar-track{grid-column:1/-1;grid-row:2}}
+
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;white-space:nowrap}
+td.r,th.r{text-align:right}
+.pac-cell{display:flex;align-items:center;gap:8px}
+.pac-cell small{display:block;color:var(--muted);font-size:.78rem}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:18px;display:grid;gap:12px;align-content:start;border-top:4px solid var(--c)}
+.card .who{display:grid;gap:2px}
+.card .kind{font-size:.8rem;color:var(--muted)}
+.card dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:.86rem}
+.card dt{color:var(--muted)}
+.card dd{margin:0;min-width:0}
+.card .big{font-family:var(--display);font-size:1.6rem;font-weight:600}
+.split-bar{display:flex;height:8px;border-radius:4px;overflow:hidden;background:var(--surface-2)}
+.split-bar i{display:block;height:100%}
+.split-key{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.78rem;color:var(--muted)}
+.split-key b{font-weight:500;color:var(--fg)}
+.uses{display:flex;flex-wrap:wrap;gap:6px}
+.use{font-size:.76rem;background:var(--surface-2);border-radius:4px;padding:3px 7px}
+.btn{justify-self:start;font:inherit;font-size:.86rem;font-weight:500;color:var(--accent);background:var(--accent-soft);border:1px solid transparent;border-radius:6px;padding:7px 12px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+
+.tl-controls{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;font-size:.86rem}
+.tl-controls label{display:inline-flex;gap:7px;align-items:center;cursor:pointer}
+.chart-scroll{overflow-x:auto}
+svg text{fill:var(--muted);font-family:var(--mono);font-size:10px}
+svg .grid{stroke:var(--line);stroke-width:1}
+svg .axis{stroke:var(--muted);stroke-width:1}
+.tip{font-size:.85rem;color:var(--muted);min-height:1.4em}
+
+.filters{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr) auto;gap:10px;align-items:end}
+@media (max-width:760px){.filters{grid-template-columns:1fr 1fr}.filters .search{grid-column:1/-1}}
+.field{display:grid;gap:4px;font-size:.78rem;color:var(--muted)}
+.field input,.field select{font:inherit;font-size:.9rem;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:100%;min-width:0}
+.field input:focus,.field select:focus{outline:2px solid var(--accent);outline-offset:0;border-color:transparent}
+.ghost{font:inherit;font-size:.86rem;background:none;border:1px solid var(--line);color:var(--fg);border-radius:6px;padding:8px 12px;cursor:pointer;white-space:nowrap}
+.ghost:hover{border-color:var(--muted)}
+.result-line{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.88rem;color:var(--muted)}
+.result-line b{color:var(--fg)}
+.table-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.table-wrap table{min-width:820px}
+.table-wrap th button{all:unset;cursor:pointer;display:inline-flex;gap:4px;align-items:center}
+.table-wrap th button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.table-wrap tbody tr:hover{background:var(--surface-2)}
+.tag{display:inline-block;font-size:.7rem;font-family:var(--mono);color:var(--flag);background:var(--flag-bg);border-radius:4px;padding:1px 6px;margin-top:4px;letter-spacing:.02em}
+.desc{max-width:34ch}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+
+.notes{display:grid;gap:14px;max-width:76ch}
+.notes li{margin-bottom:8px}
+.notes ul{margin:0;padding-left:20px}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:.82rem}
+footer .wrap{padding-block:20px}
+@media (prefers-reduced-motion:no-preference){.bar-fill{transition:width .4s ease}html{scroll-behavior:smooth}}
+</style>
+
+<header class="top"><div class="wrap">
+  <span class="eyebrow">FEC Schedule B · Itemized disbursements · Payee state = IL</span>
+  <h1>Illinois PAC Consultants</h1>
+  <p class="lede">Every consultant with an Illinois address that was paid by a committee tied to a possible 2028 Democratic presidential candidate (their PACs, plus the Senate campaigns of Jon Ossoff, Mark Kelly and Cory Booker), and every payment reported to them.</p>
+  <div class="meta-row">
+    <span>Period <b>Jan 2025 – Sep 2026</b></span>
+    <span>Source <b>FEC Schedule B exports, 22–24 Nov 2026</b></span>
+    <span>Filter <b>recipient_state = "IL"</b></span>
+  </div>
+</div></header>
+
+<nav class="sections" aria-label="Sections"><div class="wrap" id="navlinks">
+  <a href="#summary">Summary</a><a href="#hired">Hired by</a><a href="#consultants">Consultants</a><a href="#timeline">Timeline</a><a href="#payments">Payments</a><a href="#notes">Notes</a>
+</div></nav>
+
+<main><div class="wrap">
+
+<section id="summary" aria-labelledby="h-summary">
+  <div class="sec-head"><span class="eyebrow">Summary</span><h2 id="h-summary">Where the Illinois consulting money went</h2></div>
+  <div class="tiles" id="tiles"></div>
+</section>
+
+<section id="hired" aria-labelledby="h-hired">
+  <div class="sec-head"><span class="eyebrow">Hired by</span><h2 id="h-hired">Who hired whom</h2>
+    <p>Consultants ranked by total paid, colored by the PAC that paid them. Select a row or a PAC to filter the payment ledger.</p></div>
+  <div class="split">
+    <div class="panel"><div class="bars" id="bars"></div></div>
+    <div class="panel"><table><thead><tr><th>PAC</th><th class="r">Paid</th><th class="r">Pmts</th></tr></thead><tbody id="pactable"></tbody></table></div>
+  </div>
+</section>
+
+<section id="consultants" aria-labelledby="h-cons">
+  <div class="sec-head"><span class="eyebrow">Consultants</span><h2 id="h-cons">The 10 consultants</h2>
+    <p>One card per payee. "Paid as consulting" counts only payments the PAC itself described as consulting.</p></div>
+  <div class="cards" id="cards"></div>
+</section>
+
+<section id="timeline" aria-labelledby="h-tl">
+  <div class="sec-head"><span class="eyebrow">Timeline</span><h2 id="h-tl">Payments by month</h2>
+    <p>Monthly totals stacked by committee. Aisle 518's media buys for Ossoff and Newsom (payments of $100K or more not described as consulting) dwarf everything else, so you can take them out of the scale to see the rest.</p></div>
+  <div class="panel" style="display:grid;gap:12px">
+    <div class="tl-controls">
+      <label><input type="checkbox" id="tl-big" checked> Include media and ad buys of $100K+</label>
+      <div class="legend" id="tl-legend"></div>
+    </div>
+    <div class="chart-scroll"><svg id="tl" role="img" aria-label="Monthly payments to Illinois consultants by committee"></svg></div>
+    <p class="tip" id="tl-tip">Hover or tap a month to see its breakdown.</p>
+  </div>
+</section>
+
+<section id="payments" aria-labelledby="h-pay">
+  <div class="sec-head"><span class="eyebrow">Payments</span><h2 id="h-pay">Every payment</h2>
+    <p>Search, filter and sort all itemized payments. Each row links to the page of the original FEC filing.</p></div>
+  <div class="filters">
+    <label class="field search">Search payee, description or date<input id="f-q" type="search" placeholder="e.g. digital, Hobert, 2026-07"></label>
+    <label class="field">PAC<select id="f-pac"><option value="">All PACs</option></select></label>
+    <label class="field">Consultant<select id="f-con"><option value="">All consultants</option></select></label>
+    <button class="ghost" id="f-reset" type="button">Clear filters</button>
+  </div>
+  <div class="result-line" id="result-line"></div>
+  <div class="table-wrap"><table>
+    <thead><tr>
+      <th><button type="button" data-sort="d">Date <span></span></button></th>
+      <th><button type="button" data-sort="c">Consultant <span></span></button></th>
+      <th><button type="button" data-sort="p">Paid by <span></span></button></th>
+      <th>Description</th>
+      <th>Report</th>
+      <th class="r"><button type="button" data-sort="a">Amount <span></span></button></th>
+      <th>Filing</th>
+    </tr></thead>
+    <tbody id="rows"></tbody>
+  </table></div>
+</section>
+
+<section id="notes" aria-labelledby="h-notes">
+  <div class="sec-head"><span class="eyebrow">Notes</span><h2 id="h-notes">How this list was built</h2></div>
+  <div class="notes">
+    <ul>
+      <li><b>Illinois</b> means the PAC reported the payee's address with <span class="num">recipient_state = "IL"</span>. It's a mailing address, not proof the work happened in Illinois. The same firm can appear under another state elsewhere: the Murphy Mobilization Fund paid Aisle 518 Strategies <span class="num">$1,089,763</span> at a Washington, DC address, and Mark Kelly for Senate paid it <span class="num">$12.95M</span> at an Arlington, VA address. Neither is counted here.</li>
+      <li><b>Consultant</b> means a payee with at least one payment described as consulting (strategic, fundraising, digital or compliance). All of that payee's payments are included. Aisle 518 Strategies is included as a political consulting firm, although most of its payments here are media buys.</li>
+      <li><b>Tagged rows</b> are payments to a consultant that weren't described as consulting, such as media buys, direct mail production and postage, web hosting or a travel reimbursement.</li>
+      <li><b>Left out:</b> design and production vendors (Change Media Group, Madval Design, Apollo Artistry, Fox Frame Productions, about $45K), travel, card fees, refunds to donors and contributions to candidates or parties.</li>
+      <li><b>Not found in Illinois:</b> Ready for the Fight (Pritzker), In This Together (Beshear), Juntos (Gallego), American Mobilization (Murphy), Courage to Change (Ocasio-Cortez), the Murphy Mobilization Fund, the Mark Kelly Victory Fund and Purpose PAC (Booker) paid no Illinois consultants in this data. Independent expenditures (Schedule E) aren't included.</li>
+      <li><b>PAC links to people</b> follow news reporting and the donor and address patterns in the filings. Win the Era, Fight Like Hell and Unity First are not formally sponsored leadership PACs, and the Senate campaigns are included because their candidates are possible 2028 contenders, so treat those links as "associated with".</li>
+      <li><b>Addresses</b> come from the PACs' raw electronic filings (.fec files on docquery.fec.gov), because the FEC's data export has only city and ZIP. Each consultant had the same address on every filing. Street addresses for the individuals and for firms that filed at a home or apartment address are left off this page but are in <span class="num">illinois_consultants_entities.csv</span>.</li>
+      <li><b>Websites</b> were found by web search. Only Authentic's (authentic.org) is confirmed. Aisle 518 Strategies is described elsewhere as a Washington, DC firm with a remote staff, so its Chicago address may be a satellite office.</li>
+      <li>Only itemized payments appear. Filings run through 30 Sep 2026.</li>
+    </ul>
+  </div>
+</section>
+
+</div></main>
+<footer><div class="wrap">Data: Federal Election Commission, Schedule B itemized disbursements. Compiled 24 Nov 2026.</div></footer>
+
+<script>
+const DATA = [{"d":"2025-01-08","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":4615.0,"m":false,"desc":"ADVERTISING & ACQUISITION","ln":"21B","rt":"2025 MY","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507319764498428","k":false},{"d":"2025-01-09","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":393862.5,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202505239761720180","k":false},{"d":"2025-01-15","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":100000.0,"m":false,"desc":"ACQUISITION","ln":"21B","rt":"2025 MY","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507319764498451","k":false},{"d":"2025-01-21","p":"C00836346","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":20000.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2025 MY","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507319764444649","k":true},{"d":"2025-01-22","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":85015.0,"m":false,"desc":"ACQUISITION","ln":"21B","rt":"2025 MY","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507319764498434","k":false},{"d":"2025-01-22","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":8015.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2025 MY","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507319764498439","k":true},{"d":"2025-01-23","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":110000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202505239761720075","k":false},{"d":"2025-01-30","p":"C00696526","c":"ROSS STRATEGIES","city":"Chicago","z":"60612","a":3750.0,"m":false,"desc":"FUNDRAISING CONSULTING","ln":"17","rt":"2025 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202504159755510453","k":true},{"d":"2025-02-04","p":"C00836346","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":20000.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2025 MY","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507319764444650","k":true},{"d":"2025-02-10","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":22165.7,"m":false,"desc":"DIRECT MAIL CONSULTING SERVICES","ln":"17","rt":"2025 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510219791981031","k":true},{"d":"2025-02-11","p":"C00540500","c":"KRUSE STRATEGIC COMMUNICATIONS","city":"Springfield","z":"62711","a":1500.0,"m":false,"desc":"RESEARCH CONSULTING SERVICES","ln":"17","rt":"2025 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510219791981045","k":true},{"d":"2025-02-18","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":445410.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202505239761720081","k":false},{"d":"2025-02-21","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":10000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202505239761720085","k":false},{"d":"2025-02-28","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":500000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202505239761720144","k":false},{"d":"2025-03-03","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":8025.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2025 MY","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507319764498411","k":true},{"d":"2025-03-03","p":"C00696526","c":"ROSS STRATEGIES","city":"Chicago","z":"60612","a":1875.0,"m":false,"desc":"FUNDRAISING CONSULTING","ln":"17","rt":"2025 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202504159755510487","k":true},{"d":"2025-03-05","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":30498.97,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202505239761720178","k":false},{"d":"2025-03-05","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":26873.92,"m":false,"desc":"DIRECT MAIL CONSULTING SERVICES","ln":"17","rt":"2025 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510219791981032","k":true},{"d":"2025-03-06","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":1000000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202505239761720116","k":false},{"d":"2025-03-06","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":6000.0,"m":false,"desc":"DIRECT MAIL CONSULTING SERVICES","ln":"17","rt":"2025 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510219791981032","k":true},{"d":"2025-03-07","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":2638.89,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202505239761720087","k":false},{"d":"2025-03-18","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":400000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202505239761720084","k":false},{"d":"2025-03-20","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":8025.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2025 MY","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507319764498406","k":true},{"d":"2025-03-20","p":"C00697441","c":"HOBERT, ROBERT","city":"Chicago","z":"60618","a":7791.3,"m":false,"desc":"STRATEGIC CONSULTING SERVICES","ln":"21B","rt":"2025 MY","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507319789370146","k":true},{"d":"2025-03-21","p":"C00836346","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":20000.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2025 MY","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507319764444650","k":true},{"d":"2025-03-21","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":10438.32,"m":false,"desc":"DIRECT MAIL CONSULTING SERVICES","ln":"17","rt":"2025 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510219791981032","k":true},{"d":"2025-03-25","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":50000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202505239761720117","k":false},{"d":"2025-03-27","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":200000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202505239761720117","k":false},{"d":"2025-03-27","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":250000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202505239761720207","k":false},{"d":"2025-03-31","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":10000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202505239761720184","k":false},{"d":"2025-03-31","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":8025.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2025 MY","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507319764498437","k":true},{"d":"2025-04-01","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":880000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507159763407033","k":false},{"d":"2025-04-01","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":3170.76,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507159763407070","k":false},{"d":"2025-04-02","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":33545.56,"m":false,"desc":"DIRECT MAIL PRODUCTION","ln":"17","rt":"2025 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510219791991203","k":false},{"d":"2025-04-02","p":"C00696526","c":"ROSS STRATEGIES","city":"Chicago","z":"60612","a":3750.0,"m":false,"desc":"FUNDRAISING CONSULTING","ln":"17","rt":"2025 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507159763054957","k":true},{"d":"2025-04-08","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":300000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507159763407114","k":false},{"d":"2025-04-10","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":54868.75,"m":false,"desc":"DIRECT MAIL PRODUCTION","ln":"17","rt":"2025 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510219791991203","k":false},{"d":"2025-04-10","p":"C00697441","c":"HOBERT, ROBERT","city":"Chicago","z":"60618","a":5600.0,"m":false,"desc":"STRATEGIC CONSULTING SERVICES","ln":"21B","rt":"2025 MY","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507319789370146","k":true},{"d":"2025-04-11","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":31370.75,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507159763407121","k":false},{"d":"2025-04-18","p":"C00836346","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":20000.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2025 MY","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507319764444650","k":true},{"d":"2025-04-25","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":8609.53,"m":false,"desc":"DIRECT MAIL CONSULTING SERVICES","ln":"17","rt":"2025 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510219791991203","k":true},{"d":"2025-04-28","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":511000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507159763407067","k":false},{"d":"2025-05-01","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":8025.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2025 MY","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507319764498409","k":true},{"d":"2025-05-01","p":"C00540500","c":"KRUSE STRATEGIC COMMUNICATIONS","city":"Springfield","z":"62711","a":1500.0,"m":false,"desc":"RESEARCH CONSULTING SERVICES","ln":"17","rt":"2025 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510219791991223","k":true},{"d":"2025-05-08","p":"C00836346","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":20000.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2025 MY","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507319764444651","k":true},{"d":"2025-05-09","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":46289.59,"m":false,"desc":"DIRECT MAIL PRODUCTION","ln":"17","rt":"2025 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510219791991204","k":false},{"d":"2025-05-12","p":"C00697441","c":"HOBERT, ROBERT","city":"Chicago","z":"60618","a":5600.0,"m":false,"desc":"STRATEGIC CONSULTING SERVICES","ln":"21B","rt":"2025 MY","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507319789370146","k":true},{"d":"2025-05-13","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":379406.07,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507159763407205","k":false},{"d":"2025-05-15","p":"C00696526","c":"ROSS STRATEGIES","city":"Chicago","z":"60612","a":3750.0,"m":false,"desc":"FUNDRAISING CONSULTING","ln":"17","rt":"2025 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507159763055005","k":true},{"d":"2025-05-22","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":32288.81,"m":false,"desc":"DIRECT MAIL PRODUCTION","ln":"17","rt":"2025 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510219791991204","k":false},{"d":"2025-05-22","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":6000.0,"m":false,"desc":"DIRECT MAIL CONSULTING SERVICES","ln":"17","rt":"2025 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510219791991204","k":true},{"d":"2025-06-02","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":48121.88,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507159763407144","k":false},{"d":"2025-06-03","p":"C00696526","c":"ROSS STRATEGIES","city":"Chicago","z":"60612","a":3750.0,"m":false,"desc":"FUNDRAISING CONSULTING","ln":"17","rt":"2025 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507159763055001","k":true},{"d":"2025-06-03","p":"C00696526","c":"ROSS STRATEGIES","city":"Chicago","z":"60612","a":459.0,"m":false,"desc":"FUNDRAISING CONSULTING","ln":"17","rt":"2025 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507159763055006","k":true},{"d":"2025-06-04","p":"C00836346","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":20000.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2025 MY","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507319764444651","k":true},{"d":"2025-06-05","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":78813.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507159763407071","k":false},{"d":"2025-06-09","p":"C00697441","c":"HOBERT, ROBERT","city":"Chicago","z":"60618","a":5600.0,"m":false,"desc":"STRATEGIC CONSULTING SERVICES","ln":"21B","rt":"2025 MY","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507319789370147","k":true},{"d":"2025-06-13","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":510000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507159763407090","k":false},{"d":"2025-06-13","p":"C00836320","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":1500000.0,"m":false,"desc":"DIGITAL ADVERTISING","ln":"21B","rt":"2025 MY","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507319764500649","k":false},{"d":"2025-06-18","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":500000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507159763407117","k":false},{"d":"2025-06-20","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":6000.0,"m":false,"desc":"DIRECT MAIL CONSULTING SERVICES","ln":"17","rt":"2025 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510219791991205","k":true},{"d":"2025-06-26","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":8025.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2025 MY","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507319764498437","k":true},{"d":"2025-06-30","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":8025.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2025 MY","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507319764498412","k":true},{"d":"2025-06-30","p":"C00697441","c":"HOBERT, ROBERT","city":"Chicago","z":"60618","a":4800.0,"m":false,"desc":"STRATEGIC CONSULTING SERVICES","ln":"21B","rt":"2025 MY","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202507319789370147","k":true},{"d":"2025-07-02","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":111000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510159791442493","k":false},{"d":"2025-07-02","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":250000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510159791442517","k":false},{"d":"2025-07-02","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":10025.0,"m":false,"desc":"ADVERTISING & ACQUISITION","ln":"21B","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202603099837910238","k":false},{"d":"2025-07-02","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":15025.0,"m":false,"desc":"ADVERTISING & ACQUISITION","ln":"21B","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202603099837910243","k":false},{"d":"2025-07-02","p":"C00696526","c":"ROSS STRATEGIES","city":"Chicago","z":"60612","a":3750.0,"m":false,"desc":"FUNDRAISING CONSULTING","ln":"17","rt":"2025 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510159791357413","k":true},{"d":"2025-07-07","p":"C00697441","c":"PRATT'S LLC","city":"Chicago","z":"60614","a":20000.0,"m":false,"desc":"FUNDRAISING CONSULTING SERVICES","ln":"21B","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202601309795075272","k":true},{"d":"2025-07-08","p":"C00836346","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":20000.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202604249866697675","k":true},{"d":"2025-07-10","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":10000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510159791442482","k":false},{"d":"2025-07-15","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":6000.0,"m":false,"desc":"DIRECT MAIL CONSULTING SERVICES","ln":"17","rt":"2025 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510159791497942","k":true},{"d":"2025-07-15","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":90200.0,"m":false,"desc":"DIRECT MAIL POSTAGE","ln":"17","rt":"2025 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510159791497942","k":false},{"d":"2025-07-16","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":350000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510159791442455","k":false},{"d":"2025-07-18","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":716295.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510159791442493","k":false},{"d":"2025-07-29","p":"C00540500","c":"KRUSE STRATEGIC COMMUNICATIONS","city":"Springfield","z":"62711","a":1500.0,"m":false,"desc":"RESEARCH CONSULTING SERVICES","ln":"17","rt":"2025 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510159791497967","k":true},{"d":"2025-07-31","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":8025.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202603099837910248","k":true},{"d":"2025-07-31","p":"C00697441","c":"HOBERT, ROBERT","city":"Chicago","z":"60618","a":6000.0,"m":false,"desc":"STRATEGIC CONSULTING SERVICES","ln":"21B","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202601309795075260","k":true},{"d":"2025-08-04","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":76167.04,"m":false,"desc":"DIRECT MAIL POSTAGE","ln":"17","rt":"2025 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510159791497942","k":false},{"d":"2025-08-04","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":11292.65,"m":false,"desc":"DIRECT MAIL PRODUCTION","ln":"17","rt":"2025 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510159791497943","k":false},{"d":"2025-08-04","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":24354.5,"m":false,"desc":"DIRECT MAIL PRODUCTION","ln":"17","rt":"2025 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510159791497943","k":false},{"d":"2025-08-06","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":220000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510159791442512","k":false},{"d":"2025-08-06","p":"C00836338","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":78668.39,"m":false,"desc":"TEXT MESSAGING","ln":"21B","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202601309794800782","k":false},{"d":"2025-08-11","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":496440.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510159791442491","k":false},{"d":"2025-08-15","p":"C00696526","c":"ROSS STRATEGIES","city":"Chicago","z":"60612","a":3750.0,"m":false,"desc":"FUNDRAISING CONSULTING","ln":"17","rt":"2025 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510159791357536","k":true},{"d":"2025-08-22","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":350000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510159791442482","k":false},{"d":"2025-08-27","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":46025.0,"m":false,"desc":"ADVERTISING & ACQUISITION","ln":"21B","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202603099837910252","k":false},{"d":"2025-08-29","p":"C00697441","c":"HOBERT, ROBERT","city":"Chicago","z":"60618","a":6000.0,"m":false,"desc":"STRATEGIC CONSULTING SERVICES","ln":"21B","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202601309795075260","k":true},{"d":"2025-09-05","p":"C00836346","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":20000.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202604249866697675","k":true},{"d":"2025-09-11","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":8025.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202603099837910226","k":true},{"d":"2025-09-12","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":417880.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510159791442449","k":false},{"d":"2025-09-15","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":13615.0,"m":false,"desc":"DIRECT MAIL POSTAGE","ln":"17","rt":"2025 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510159791497943","k":false},{"d":"2025-09-16","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":50875.32,"m":false,"desc":"LIST ACQUISITION","ln":"17","rt":"2025 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510159791497944","k":false},{"d":"2025-09-16","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":6000.0,"m":false,"desc":"DIRECT MAIL CONSULTING SERVICES","ln":"17","rt":"2025 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510159791497944","k":true},{"d":"2025-09-17","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":510000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510159791442454","k":false},{"d":"2025-09-22","p":"C00696526","c":"ROSS STRATEGIES","city":"Chicago","z":"60612","a":3750.0,"m":false,"desc":"FUNDRAISING CONSULTING","ln":"17","rt":"2025 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510159791357465","k":true},{"d":"2025-09-23","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":500000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202510159791442463","k":false},{"d":"2025-09-30","p":"C00697441","c":"HOBERT, ROBERT","city":"Chicago","z":"60618","a":6000.0,"m":false,"desc":"STRATEGIC CONSULTING SERVICES","ln":"21B","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202601309795075261","k":true},{"d":"2025-10-01","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":650000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202601319808484656","k":false},{"d":"2025-10-01","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":8025.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202603099837910226","k":true},{"d":"2025-10-03","p":"C00696526","c":"ROSS STRATEGIES","city":"Chicago","z":"60612","a":1875.0,"m":false,"desc":"FUNDRAISING CONSULTING","ln":"17","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202601319795364334","k":true},{"d":"2025-10-08","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":89948.0,"m":false,"desc":"DIRECT MAIL POSTAGE","ln":"17","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607019874303183","k":false},{"d":"2025-10-14","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":470000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202601319808484664","k":false},{"d":"2025-10-14","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":178407.8,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202601319808484670","k":false},{"d":"2025-10-15","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":6000.0,"m":false,"desc":"DIRECT MAIL CONSULTING SERVICES","ln":"17","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607019874303184","k":true},{"d":"2025-10-16","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":450000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202601319808484693","k":false},{"d":"2025-10-16","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":47637.86,"m":false,"desc":"DIRECT MAIL ACQUISITION","ln":"17","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607019874303184","k":false},{"d":"2025-10-16","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":11010.89,"m":false,"desc":"DIRECT MAIL PRODUCTION","ln":"17","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607019874303184","k":false},{"d":"2025-10-24","p":"C00540500","c":"KRUSE STRATEGIC COMMUNICATIONS","city":"Springfield","z":"62711","a":1500.0,"m":false,"desc":"RESEARCH CONSULTING SERVICES","ln":"17","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607019874303208","k":true},{"d":"2025-10-28","p":"C00697441","c":"HOBERT, ROBERT","city":"Chicago","z":"60618","a":6000.0,"m":false,"desc":"STRATEGIC CONSULTING SERVICES","ln":"21B","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202601309795075261","k":true},{"d":"2025-11-03","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":8025.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202603099837910275","k":true},{"d":"2025-11-06","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":450000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202601319808484812","k":false},{"d":"2025-11-19","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":6000.0,"m":false,"desc":"DIRECT MAIL CONSULTING SERVICES","ln":"17","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607019874303185","k":true},{"d":"2025-11-19","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":6000.0,"m":false,"desc":"DIRECT MAIL CONSULTING SERVICES","ln":"17","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607019874303185","k":true},{"d":"2025-11-20","p":"C00836346","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":100000.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202604249866697675","k":true},{"d":"2025-11-21","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":265406.14,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202601319808484888","k":false},{"d":"2025-11-28","p":"C00697441","c":"HOBERT, ROBERT","city":"Chicago","z":"60618","a":6000.0,"m":false,"desc":"STRATEGIC CONSULTING SERVICES","ln":"21B","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202601309795075261","k":true},{"d":"2025-12-02","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":8000.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202603099837910262","k":true},{"d":"2025-12-04","p":"C00836346","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":27977.22,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202604249866697676","k":true},{"d":"2025-12-08","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":324467.1,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202601319808484696","k":false},{"d":"2025-12-10","p":"C00876094","c":"HEARTLAND COMPLIANCE","city":"Mascoutah","z":"62258","a":1500.0,"m":false,"desc":"NON-CONTRIBUTION ACCONT, COMPLIANCE CONSULTING","ln":"29","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202601319795326567","k":true},{"d":"2025-12-15","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":554.92,"m":false,"desc":"WEB HOSTING","ln":"21B","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202603099837910230","k":false},{"d":"2025-12-26","p":"C00697441","c":"HOBERT, ROBERT","city":"Chicago","z":"60618","a":6000.0,"m":false,"desc":"STRATEGIC CONSULTING SERVICES","ln":"21B","rt":"2025 YE","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202601309795075262","k":true},{"d":"2026-01-02","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":8000.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2026 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202604159857400843","k":true},{"d":"2026-01-06","p":"C00836346","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":20023.18,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2026 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202604159857269269","k":true},{"d":"2026-01-07","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":652336.98,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2026 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202604159862507286","k":false},{"d":"2026-01-07","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":89164.12,"m":false,"desc":"DIRECT MAIL PRODUCTION","ln":"17","rt":"2026 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607149874989894","k":false},{"d":"2026-01-07","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":12000.0,"m":false,"desc":"DIRECT MAIL CONSULTING SERVICES","ln":"17","rt":"2026 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607149874989895","k":true},{"d":"2026-01-07","p":"C00876094","c":"HEARTLAND COMPLIANCE","city":"Mascoutah","z":"62258","a":3000.0,"m":false,"desc":"NON- CONTRIBUTION ACCOUNT, COMPLIANCE CONSULTING","ln":"29","rt":"2026 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202604159857598240","k":true},{"d":"2026-01-26","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":66068.0,"m":false,"desc":"DIRECT MAIL POSTAGE","ln":"17","rt":"2026 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607149874989895","k":false},{"d":"2026-01-26","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":6000.0,"m":false,"desc":"DIRECT MAIL CONSULTING SERVICES","ln":"17","rt":"2026 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607149874989895","k":true},{"d":"2026-01-26","p":"C00697441","c":"HOBERT, ROBERT","city":"Chicago","z":"60618","a":6000.0,"m":false,"desc":"STRATEGIC CONSULTING SERVICES","ln":"21B","rt":"2026 M2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202602209837827308","k":true},{"d":"2026-01-28","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":870000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2026 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202604159862507187","k":false},{"d":"2026-02-02","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":8000.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2026 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202604159857400851","k":true},{"d":"2026-02-05","p":"C00836346","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":20072.12,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2026 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202604159857269270","k":true},{"d":"2026-02-05","p":"C00540500","c":"KRUSE STRATEGIC COMMUNICATIONS","city":"Springfield","z":"62711","a":1500.0,"m":false,"desc":"RESEARCH CONSULTING SERVICES","ln":"17","rt":"2026 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607149874989913","k":true},{"d":"2026-02-06","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":907825.31,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2026 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202604159862507394","k":false},{"d":"2026-02-11","p":"C00876094","c":"HEARTLAND COMPLIANCE","city":"Mascoutah","z":"62258","a":6000.0,"m":false,"desc":"NON-CONTRIBUTION ACCOUNT: COMPLIANCE CONSULTING","ln":"29","rt":"2026 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202604159857598241","k":true},{"d":"2026-02-12","p":"C00697441","c":"HOBERT, ROBERT","city":"Chicago","z":"60618","a":1270.16,"m":false,"desc":"REIMBURSEMENT, TRAVEL","ln":"21B","rt":"2026 M3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202603209856775392","k":false},{"d":"2026-02-26","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":1421215.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2026 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202604159862507184","k":false},{"d":"2026-02-26","p":"C00697441","c":"HOBERT, ROBERT","city":"Chicago","z":"60618","a":6000.0,"m":false,"desc":"STRATEGIC CONSULTING SERVICES","ln":"21B","rt":"2026 M3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202603209856775393","k":true},{"d":"2026-02-27","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":8000.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2026 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202604159857400856","k":true},{"d":"2026-03-02","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":15575.73,"m":false,"desc":"DIRECT MAIL POSTAGE","ln":"17","rt":"2026 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607149874989896","k":false},{"d":"2026-03-02","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":6000.0,"m":false,"desc":"DIRECT MAIL CONSULTING SERVICES","ln":"17","rt":"2026 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607149874989896","k":true},{"d":"2026-03-04","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":15000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2026 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202604159862507475","k":false},{"d":"2026-03-06","p":"C00876094","c":"HEARTLAND COMPLIANCE","city":"Mascoutah","z":"62258","a":3000.0,"m":false,"desc":"NON-CONTRIBUTION ACCOUNT: COMPLIANCE CONSULTING","ln":"29","rt":"2026 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202604159857598241","k":true},{"d":"2026-03-11","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":100000.0,"m":false,"desc":"ADVERTISING & ACQUISITION","ln":"21B","rt":"2026 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202604159857400855","k":false},{"d":"2026-03-17","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":19950.0,"m":false,"desc":"DIRECT MAIL PRODUCTION","ln":"17","rt":"2026 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607149874989896","k":false},{"d":"2026-03-17","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":112415.64,"m":false,"desc":"DIRECT MAIL PRODUCTION","ln":"17","rt":"2026 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607149874989897","k":false},{"d":"2026-03-26","p":"C00697441","c":"HOBERT, ROBERT","city":"Chicago","z":"60618","a":6000.0,"m":false,"desc":"STRATEGIC CONSULTING SERVICES","ln":"21B","rt":"2026 M4","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202604209863307612","k":true},{"d":"2026-03-27","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":306000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2026 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202604159862507289","k":false},{"d":"2026-03-27","p":"C00836346","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":241526.82,"m":false,"desc":"DIGITAL CONSULTING & ADVERTISING","ln":"21B","rt":"2026 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202604159857269270","k":true},{"d":"2026-03-31","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":8000.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2026 Q1","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202604159857400851","k":true},{"d":"2026-04-06","p":"C00836346","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":23627.4,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2026 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607159875065933","k":true},{"d":"2026-04-06","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":350.0,"m":false,"desc":"WEB HOSTING AND DESIGN","ln":"21B","rt":"2026 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607159875203831","k":false},{"d":"2026-04-09","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":615000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2026 12P","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202605079866885323","k":false},{"d":"2026-04-14","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":90269.19,"m":false,"desc":"DIRECT MAIL POSTAGE","ln":"17","rt":"2026 12P","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607149875016142","k":false},{"d":"2026-04-23","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":220340.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2026 12P","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202605079866885353","k":false},{"d":"2026-04-24","p":"C00540500","c":"KRUSE STRATEGIC COMMUNICATIONS","city":"Springfield","z":"62711","a":1500.0,"m":false,"desc":"RESEARCH CONSULTING SERVICES","ln":"17","rt":"2026 12P","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607149875016148","k":true},{"d":"2026-04-27","p":"C00697441","c":"HOBERT, ROBERT","city":"Chicago","z":"60618","a":6000.0,"m":false,"desc":"STRATEGIC CONSULTING SERVICES","ln":"21B","rt":"2026 M5","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202605209867466675","k":true},{"d":"2026-04-29","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":208400.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2026 12P","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202605079866885242","k":false},{"d":"2026-05-01","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":8000.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2026 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607159875203828","k":true},{"d":"2026-05-06","p":"C00876094","c":"HEARTLAND COMPLIANCE","city":"Mascoutah","z":"62258","a":3000.0,"m":false,"desc":"NON-CONTRIBUTION ACCOUNT: COMPLIANCE CONSULTING","ln":"29","rt":"2026 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607159875092284","k":true},{"d":"2026-05-18","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":430000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2026 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607159880513246","k":false},{"d":"2026-05-20","p":"C00876094","c":"HEARTLAND COMPLIANCE","city":"Mascoutah","z":"62258","a":3000.0,"m":false,"desc":"NON-CONTRIBUTION ACCOUNT: COMPLIANCE CONSULTING","ln":"29","rt":"2026 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607159875092285","k":true},{"d":"2026-05-26","p":"C00697441","c":"HOBERT, ROBERT","city":"Chicago","z":"60618","a":6000.0,"m":false,"desc":"STRATEGIC CONSULTING SERVICES","ln":"21B","rt":"2026 M6","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202606189870759532","k":true},{"d":"2026-05-28","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":16318.0,"m":false,"desc":"DIRECT MAIL POSTAGE","ln":"17","rt":"2026 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607159875541390","k":false},{"d":"2026-05-28","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":89550.0,"m":false,"desc":"DIRECT MAIL POSTAGE","ln":"17","rt":"2026 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607159875541390","k":false},{"d":"2026-05-28","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":59544.86,"m":false,"desc":"DIRECT MAIL PRODUCTION","ln":"17","rt":"2026 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607159875541391","k":false},{"d":"2026-06-01","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":8000.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2026 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607159875203832","k":true},{"d":"2026-06-03","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":330000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2026 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607159880513394","k":false},{"d":"2026-06-04","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":2000.0,"m":false,"desc":"WEBSITE DESIGN","ln":"21B","rt":"2026 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607159875203821","k":false},{"d":"2026-06-10","p":"C00836346","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":20033.23,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2026 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607159875065933","k":true},{"d":"2026-06-11","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":571000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2026 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607159880513418","k":false},{"d":"2026-06-15","p":"C00876094","c":"HEARTLAND COMPLIANCE","city":"Mascoutah","z":"62258","a":3000.0,"m":false,"desc":"NON CONTRIBUTION ACCOUNT: COMPLIANCE CONSULTING","ln":"29","rt":"2026 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607159875092285","k":true},{"d":"2026-06-17","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":500000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2026 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607159880513423","k":false},{"d":"2026-06-24","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":952250.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2026 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607159880513247","k":false},{"d":"2026-06-30","p":"C00836346","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":20000.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2026 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607159875065933","k":true},{"d":"2026-06-30","p":"C00836346","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":220000.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2026 Q2","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202607159875065934","k":true},{"d":"2026-07-01","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":8000.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159909464444","k":true},{"d":"2026-07-09","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":865000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159914843614","k":false},{"d":"2026-07-13","p":"C00876094","c":"HEARTLAND COMPLIANCE","city":"Mascoutah","z":"62258","a":3000.0,"m":false,"desc":"NON-CONTRIBUTION ACCOUNT: COMPLIANCE CONSULTING","ln":"29","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159909534959","k":true},{"d":"2026-07-20","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":652500.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159914843424","k":false},{"d":"2026-07-24","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":1200000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159914843428","k":false},{"d":"2026-07-27","p":"C00697441","c":"SLAINTE STRATEGIES","city":"Chicago","z":"60608","a":7500.0,"m":false,"desc":"STRATEGIC CONSULTING SERVICES","ln":"21B","rt":"2026 M8","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202608209899679540","k":true},{"d":"2026-07-28","p":"C00836346","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":26814.56,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159908835427","k":true},{"d":"2026-08-03","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":6000.0,"m":false,"desc":"DIRECT MAIL CONSULTING SERVICES","ln":"17","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159909243058","k":true},{"d":"2026-08-03","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":6000.0,"m":false,"desc":"DIRECT MAIL CONSULTING SERVICES","ln":"17","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159909243059","k":true},{"d":"2026-08-03","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":6000.0,"m":false,"desc":"DIRECT MAIL CONSULTING SERVICES","ln":"17","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159909243059","k":true},{"d":"2026-08-03","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":65785.61,"m":false,"desc":"DIRECT MAIL PRODUCTION","ln":"17","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159909243059","k":false},{"d":"2026-08-04","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":500000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159914843688","k":false},{"d":"2026-08-04","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":8000.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159909464444","k":true},{"d":"2026-08-05","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":785000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159914843620","k":false},{"d":"2026-08-11","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":60150.0,"m":false,"desc":"DIRECT MAIL POSTAGE","ln":"17","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159909243060","k":false},{"d":"2026-08-13","p":"C00876094","c":"HEARTLAND COMPLIANCE","city":"Mascoutah","z":"62258","a":3000.0,"m":false,"desc":"NON-CONTRIBUTION ACCOUNT: COMPLIANCE CONSULTING","ln":"29","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159909534960","k":true},{"d":"2026-08-18","p":"C00836346","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":25146.85,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159908835427","k":true},{"d":"2026-08-20","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":250000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159914843617","k":false},{"d":"2026-08-26","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":43000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159914843520","k":false},{"d":"2026-08-26","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":650000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159914843534","k":false},{"d":"2026-08-26","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":25000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159914843616","k":false},{"d":"2026-08-26","p":"C00697441","c":"SLAINTE STRATEGIES","city":"Chicago","z":"60608","a":7500.0,"m":false,"desc":"STRATEGIC CONSULTING SERVICES","ln":"21B","rt":"2026 M9","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202609189904410238","k":true},{"d":"2026-09-01","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":8000.0,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159909464445","k":true},{"d":"2026-09-01","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":15762.0,"m":false,"desc":"DIRECT MAIL POSTAGE","ln":"17","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159909243060","k":false},{"d":"2026-09-01","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":16428.0,"m":false,"desc":"DIRECT MAIL POSTAGE","ln":"17","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159909243060","k":false},{"d":"2026-09-01","p":"C00540500","c":"BURDICK CONSULTING GROUP, LLC","city":"Chicago","z":"60610","a":14499.7,"m":false,"desc":"DIRECT MAIL PRODUCTION","ln":"17","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159909243061","k":false},{"d":"2026-09-04","p":"C00697441","c":"SACKS, ANDREW","city":"Chicago","z":"60610","a":6000.0,"m":false,"desc":"STRATEGIC CONSULTING SERVICES","ln":"21B","rt":"2026 M10","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610209921456445","k":true},{"d":"2026-09-08","p":"C00697441","c":"SACKS, ANDREW","city":"Chicago","z":"60610","a":6000.0,"m":false,"desc":"STRATEGIC CONSULTING SERVICES","ln":"21B","rt":"2026 M10","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610209921456446","k":true},{"d":"2026-09-09","p":"C00836346","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":24813.88,"m":false,"desc":"DIGITAL CONSULTING","ln":"21B","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159908835428","k":true},{"d":"2026-09-11","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":835000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159914843622","k":false},{"d":"2026-09-16","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":718000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159914843811","k":false},{"d":"2026-09-22","p":"C00876094","c":"HEARTLAND COMPLIANCE","city":"Mascoutah","z":"62258","a":3000.0,"m":false,"desc":"NON-CONTRIBUTION ACCOUNT: COMPLIANCE CONSULTING","ln":"29","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159909534960","k":true},{"d":"2026-09-24","p":"C00718866","c":"AISLE 518 STRATEGIES, LLC","city":"Chicago","z":"60612","a":517000.0,"m":false,"desc":"MEDIA BUY","ln":"17","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159914843816","k":false},{"d":"2026-09-24","p":"C00842104","c":"AUTHENTIC CAMPAIGNS","city":"Chicago","z":"60640","a":165000.0,"m":false,"desc":"ADVERTISING, ACQUISITION & PRODUCTION","ln":"21B","rt":"2026 Q3","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610159909464445","k":false},{"d":"2026-09-28","p":"C00697441","c":"SLAINTE STRATEGIES","city":"Chicago","z":"60608","a":5000.0,"m":false,"desc":"STRATEGIC CONSULTING SERVICES","ln":"21B","rt":"2026 M10","u":"https://docquery.fec.gov/cgi-bin/fecimg/?202610209921456448","k":true}];
+const PACS = {
+  C00718866:{name:"Jon Ossoff for Senate",who:"Jon Ossoff",v:"--pac-ossoff"},
+  C00540500:{name:"Cory Booker for Senate",who:"Cory Booker",v:"--pac-booker"},
+  C00842104:{name:"Fight Like Hell PAC",who:"Gretchen Whitmer",v:"--pac-whitmer"},
+  C00697441:{name:"Win the Era PAC",who:"Pete Buttigieg",v:"--pac-buttigieg"},
+  C00836346:{name:"Campaign for Democracy Committee",who:"Gavin Newsom",v:"--pac-newsom"},
+  C00836320:{name:"Campaign for Democracy PAC",who:"Gavin Newsom",v:"--pac-newsom"},
+  C00836338:{name:"Campaign for Democracy Group",who:"Gavin Newsom",v:"--pac-newsom"},
+  C00876094:{name:"Unity First PAC",who:"Wes Moore",v:"--pac-moore"},
+  C00696526:{name:"Mark Kelly for Senate",who:"Mark Kelly",v:"--pac-kelly"}
+};
+const PEOPLE = new Set(["HOBERT, ROBERT", "SACKS, ANDREW"]);
+// Street addresses from the raw .fec filings. Residential addresses (individuals, apartment) are kept in the CSV, not shown here.
+const ADDR = {
+ "AISLE 518 STRATEGIES, LLC": {
+  "s": "2045 W Grand Ave, Ste #B",
+  "z": "60612-1577",
+  "web": null,
+  "webNote": "Not confirmed. Built In lists the firm as Washington, DC-based and fully remote; aisle518.com is likely but unverified."
+ },
+ "BURDICK CONSULTING GROUP, LLC": {
+  "s": "1415 N Dearborn St",
+  "z": "60610-1559",
+  "web": null,
+  "webNote": "None found (burdickconsultinggroup.com doesn't load; web search found nothing)"
+ },
+ "AUTHENTIC CAMPAIGNS": {
+  "s": "4422 N Ravenswood Ave, #101",
+  "z": "60640-5803",
+  "web": "https://authentic.org",
+  "webNote": "Confirmed via Idealist, Crunchbase and agency directory listings. Founder/CEO Mike Nellis."
+ },
+ "HOBERT, ROBERT": {
+  "s": null,
+  "z": "60618-4907",
+  "web": null,
+  "webNote": "Individual. No business website found."
+ },
+ "HEARTLAND COMPLIANCE": {
+  "s": "449 S Railway St",
+  "z": "62258-2326",
+  "web": null,
+  "webNote": "None found"
+ },
+ "ROSS STRATEGIES": {
+  "s": null,
+  "z": "60612-1139",
+  "web": null,
+  "webNote": "None found. Filed at a home or apartment address."
+ },
+ "PRATT'S LLC": {
+  "s": "839 W Fullerton Ave",
+  "z": "60614-2412",
+  "web": null,
+  "webNote": "None found"
+ },
+ "SLAINTE STRATEGIES": {
+  "s": null,
+  "z": "60608-3427",
+  "web": null,
+  "webNote": "None found. Filed at a home or apartment address."
+ },
+ "SACKS, ANDREW": {
+  "s": null,
+  "z": "60610-7324",
+  "web": null,
+  "webNote": "Individual. No business website found."
+ },
+ "KRUSE STRATEGIC COMMUNICATIONS": {
+  "s": null,
+  "z": "62711-9441",
+  "web": null,
+  "webNote": "None found (krusestrategiccommunications.com doesn't load). Filed at a home or apartment address."
+ }
+};
+const addrLine = (name,city) => { const a=ADDR[name]; return a&&a.s ? `${a.s}, ${city}, IL ${a.z}` : `${city}, IL ${a?a.z:""} · street address in CSV`; };
+const $ = s => document.querySelector(s);
+const fmt = n => "$" + n.toLocaleString("en-US",{minimumFractionDigits:0,maximumFractionDigits:0});
+const fmt2 = n => "$" + n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtK = n => n>=1e6 ? "$"+(n/1e6).toFixed(n>=1e7?0:2).replace(/\.?0+$/,"")+"M" : n>=1e3 ? "$"+Math.round(n/1e3)+"K" : "$"+Math.round(n);
+const col = id => `var(${PACS[id].v})`;
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const title = s => { if(PEOPLE.has(s)){const [l,f]=s.split(", ");return cap(f)+" "+cap(l)} return cap(s) };
+function cap(s){return s.toLowerCase().replace(/\b([a-z])/g,m=>m.toUpperCase()).replace(/\bLlc\b/g,"LLC").replace(/'S\b/g,"'s").replace(/\b518\b/,"518")}
+
+const total = DATA.reduce((t,r)=>t+r.a,0);
+const consultTotal = DATA.filter(r=>r.k).reduce((t,r)=>t+r.a,0);
+
+// group consultants
+const cons = {};
+DATA.forEach(r=>{
+  const c = cons[r.c] ||= {name:r.c,city:r.city,total:0,cons:0,n:0,pacs:{},uses:{},first:r.d,last:r.d};
+  c.total+=r.a; c.n++; if(r.k)c.cons+=r.a; c.pacs[r.p]=(c.pacs[r.p]||0)+r.a; c.uses[r.desc]=(c.uses[r.desc]||0)+1;
+  if(r.d<c.first)c.first=r.d; if(r.d>c.last)c.last=r.d;
+});
+const consList = Object.values(cons).sort((a,b)=>b.total-a.total);
+const pacTotals = {};
+DATA.forEach(r=>{const p=pacTotals[r.p] ||= {total:0,n:0,cons:new Set()};p.total+=r.a;p.n++;p.cons.add(r.c)});
+const pacList = Object.keys(pacTotals).sort((a,b)=>pacTotals[b].total-pacTotals[a].total);
+const mainPac = c => Object.entries(c.pacs).sort((a,b)=>b[1]-a[1])[0][0];
+const dateFmt = d => new Date(d+"T00:00:00").toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"});
+
+// tiles
+$("#tiles").innerHTML = [
+  [fmtK(total),"Total paid",`${DATA.length} itemized payments`],
+  [consList.length,"Consultants","8 firms, 2 individuals"],
+  [pacList.length,"Committees that hired them",[...new Set(pacList.map(p=>PACS[p].who.split(" ").pop()))].join(", ")],
+  [fmtK(consultTotal),"Described as consulting",`${Math.round(consultTotal/total*100)}% of the total`]
+].map(([v,l,s])=>`<div class="tile"><span class="eyebrow">${l}</span><span class="v">${v}</span><span class="s">${s}</span></div>`).join("");
+
+// bars
+const maxC = consList[0].total;
+$("#bars").innerHTML = consList.map(c=>{
+  const segs = Object.entries(c.pacs).map(([p,a])=>`<div class="bar-fill" style="width:${a/maxC*100}%;background:${col(p)};display:inline-block"></div>`).join("");
+  return `<button type="button" class="bar-row" data-con="${esc(c.name)}" aria-label="Show payments to ${esc(title(c.name))}">
+    <span class="name">${esc(title(c.name))}</span><span class="bar-track" style="display:flex">${segs}</span><span class="amt num">${fmt(c.total)}</span></button>`;
+}).join("");
+
+// pac table
+$("#pactable").innerHTML = pacList.map(p=>`<tr><td><button type="button" class="chip" data-pac="${p}" style="border:0;padding:0;background:none"><span class="pac-cell"><span class="dot" style="background:${col(p)}"></span><span style="text-align:left">${PACS[p].name}<small>${PACS[p].who}</small></span></span></button></td>
+  <td class="r num">${fmt(pacTotals[p].total)}</td><td class="r num">${pacTotals[p].n}</td></tr>`).join("") +
+  `<tr><td><b>All</b></td><td class="r num"><b>${fmt(total)}</b></td><td class="r num"><b>${DATA.length}</b></td></tr>`;
+
+// cards
+$("#cards").innerHTML = consList.map(c=>{
+  const mp = mainPac(c);
+  const uses = Object.entries(c.uses).sort((a,b)=>b[1]-a[1]).map(([u,n])=>`<span class="use">${esc(cap(u))} ×${n}</span>`).join("");
+  const consPct = Math.round(c.cons/c.total*100);
+  return `<article class="card" style="--c:${col(mp)}">
+    <div class="who"><span class="kind">${PEOPLE.has(c.name)?"Individual consultant":"Consulting firm"} · ${esc(c.city)}, IL</span><h3>${esc(title(c.name))}</h3></div>
+    <div><span class="big num">${fmt(c.total)}</span></div>
+    <dl>
+      <dt>Address</dt><dd>${esc(addrLine(c.name,c.city))}</dd>
+      <dt>Website</dt><dd>${ADDR[c.name].web?`<a href="${ADDR[c.name].web}" target="_blank" rel="noopener">${ADDR[c.name].web.replace("https://","")}</a><br>`:""}<span style="color:var(--muted)">${esc(ADDR[c.name].webNote)}</span></dd>
+      <dt>Hired by</dt><dd>${Object.keys(c.pacs).map(p=>`${PACS[p].name} <span style="color:var(--muted)">(${PACS[p].who})</span>`).join("<br>")}</dd>
+      <dt>Payments</dt><dd class="num">${c.n}</dd>
+      <dt>Dates</dt><dd>${c.first===c.last?dateFmt(c.first):dateFmt(c.first)+" – "+dateFmt(c.last)}</dd>
+    </dl>
+    <div style="display:grid;gap:6px">
+      <div class="split-bar" aria-hidden="true"><i style="width:${consPct}%;background:${col(mp)}"></i></div>
+      <div class="split-key"><span>Paid as consulting <b class="num">${fmt(c.cons)}</b></span><span>Other <b class="num">${fmt(c.total-c.cons)}</b></span></div>
+    </div>
+    <div class="uses">${uses}</div>
+    <button type="button" class="btn" data-con="${esc(c.name)}">View ${c.n} payment${c.n>1?"s":""} →</button>
+  </article>`;
+}).join("");
+
+// timeline
+const months=[]; {let y=2025,m=1; while(y<2026||(y===2026&&m<=9)){months.push(`${y}-${String(m).padStart(2,"0")}`); m++; if(m>12){m=1;y++}}}
+const byMonth = {}; months.forEach(m=>byMonth[m]={});
+DATA.forEach(r=>{const m=r.d.slice(0,7); byMonth[m][r.p]=(byMonth[m][r.p]||0)+r.a; if(!r.k&&r.a>=1e5) byMonth[m]["_big"+r.p]=(byMonth[m]["_big"+r.p]||0)+r.a});
+$("#tl-legend").innerHTML = [...new Map(pacList.map(p=>[PACS[p].who,p])).entries()].map(([w,p])=>`<span class="chip" style="cursor:default"><span class="dot" style="background:${col(p)}"></span>${w}</span>`).join("");
+function drawTL(){
+  const inc = $("#tl-big").checked;
+  const val = (m,p) => { let v=byMonth[m][p]||0; if(!inc) v-= byMonth[m]["_big"+p]||0; return Math.max(0,v) };
+  const tot = m => pacList.reduce((t,p)=>t+val(m,p),0);
+  const max = Math.max(...months.map(tot));
+  const step = niceStep(max/4), top = Math.ceil(max/step)*step;
+  const W=Math.max(720,months.length*40), H=280, L=56, R=10, T=12, B=40;
+  const bw=(W-L-R)/months.length;
+  const y=v=>T+(H-T-B)*(1-v/top);
+  let s="";
+  for(let v=0; v<=top+1; v+=step){ s+=`<line class="grid" x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}"/><text x="${L-8}" y="${y(v)+3}" text-anchor="end">${fmtK(v)}</text>` }
+  months.forEach((m,i)=>{
+    let acc=0; const x=L+i*bw+bw*0.18, w=bw*0.64;
+    pacList.forEach(p=>{const v=val(m,p); if(!v)return; s+=`<rect x="${x}" y="${y(acc+v)}" width="${w}" height="${Math.max(1,y(acc)-y(acc+v))}" fill="${col(p)}"/>`; acc+=v});
+    s+=`<rect x="${L+i*bw}" y="${T}" width="${bw}" height="${H-T-B}" fill="transparent" data-m="${m}" class="hit" tabindex="0"/>`;
+    if(i%3===0||i===months.length-1){const [yy,mm]=m.split("-");s+=`<text x="${L+i*bw+bw/2}" y="${H-B+16}" text-anchor="middle">${["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+mm-1]}</text>`; if(mm==="01"||i===0)s+=`<text x="${L+i*bw+bw/2}" y="${H-B+30}" text-anchor="middle">${yy}</text>`}
+  });
+  s+=`<line class="axis" x1="${L}" x2="${W-R}" y1="${y(0)}" y2="${y(0)}"/>`;
+  const svg=$("#tl"); svg.setAttribute("viewBox",`0 0 ${W} ${H}`); svg.setAttribute("width",W); svg.setAttribute("height",H); svg.innerHTML=s;
+  svg.querySelectorAll(".hit").forEach(h=>{
+    const show=()=>{const m=h.dataset.m; const parts=pacList.filter(p=>val(m,p)).map(p=>`${PACS[p].who} ${fmt(val(m,p))}`);
+      const d=new Date(m+"-01T00:00:00").toLocaleDateString("en-US",{month:"long",year:"numeric"});
+      $("#tl-tip").textContent = parts.length? `${d}: ${fmt(tot(m))} — ${parts.join(" · ")}` : `${d}: no payments`;};
+    h.addEventListener("mouseenter",show); h.addEventListener("focus",show); h.addEventListener("click",show);
+  });
+}
+function niceStep(x){const p=Math.pow(10,Math.floor(Math.log10(x||1)));const f=x/p;return (f<=1?1:f<=2?2:f<=5?5:10)*p}
+$("#tl-big").addEventListener("change",drawTL);
+drawTL();
+
+// table
+const fPac=$("#f-pac"), fCon=$("#f-con"), fQ=$("#f-q");
+pacList.forEach(p=>fPac.insertAdjacentHTML("beforeend",`<option value="${p}">${PACS[p].name} (${PACS[p].who})</option>`));
+consList.forEach(c=>fCon.insertAdjacentHTML("beforeend",`<option value="${esc(c.name)}">${esc(title(c.name))}</option>`));
+let sortKey="d", sortDir=-1;
+function render(){
+  const q=fQ.value.trim().toLowerCase();
+  let rows=DATA.filter(r=>(!fPac.value||r.p===fPac.value)&&(!fCon.value||r.c===fCon.value)&&
+    (!q||[r.c,title(r.c),r.desc,r.d,PACS[r.p].name,PACS[r.p].who,r.city].join(" ").toLowerCase().includes(q)));
+  rows.sort((a,b)=>{let x=a[sortKey],y=b[sortKey]; if(sortKey==="p"){x=PACS[x].name;y=PACS[y].name} return (x>y?1:x<y?-1:0)*sortDir});
+  const sum=rows.reduce((t,r)=>t+r.a,0), sumC=rows.filter(r=>r.k).reduce((t,r)=>t+r.a,0);
+  $("#result-line").innerHTML=`<span><b>${rows.length}</b> of ${DATA.length} payments</span><span>Total <b class="num">${fmt2(sum)}</b></span><span>Described as consulting <b class="num">${fmt2(sumC)}</b></span>`;
+  $("#rows").innerHTML = rows.length? rows.map(r=>`<tr>
+    <td class="num" style="white-space:nowrap">${r.d}</td>
+    <td><b style="font-weight:500">${esc(title(r.c))}</b><br><span style="color:var(--muted);font-size:.8rem">${esc(addrLine(r.c,r.city))}</span></td>
+    <td><span class="pac-cell"><span class="dot" style="background:${col(r.p)}"></span><span>${PACS[r.p].name}<small>${PACS[r.p].who}</small></span></span></td>
+    <td class="desc">${esc(cap(r.desc))}${r.k?"":`<br><span class="tag">Not described as consulting</span>`}</td>
+    <td class="num" style="white-space:nowrap;color:var(--muted)">${esc(r.rt)}<br>Line ${esc(r.ln)}</td>
+    <td class="r num" style="white-space:nowrap">${fmt2(r.a)}</td>
+    <td><a href="${esc(r.u)}" target="_blank" rel="noopener">FEC image</a></td></tr>`).join("") :
+    `<tr><td colspan="7" class="empty">No payments match. Clear a filter or change the search.</td></tr>`;
+  document.querySelectorAll("th button[data-sort]").forEach(b=>{const on=b.dataset.sort===sortKey;b.querySelector("span").textContent=on?(sortDir>0?"▲":"▼"):"";b.closest("th").setAttribute("aria-sort",on?(sortDir>0?"ascending":"descending"):"none")});
+}
+document.querySelectorAll("th button[data-sort]").forEach(b=>b.addEventListener("click",()=>{const k=b.dataset.sort; if(k===sortKey)sortDir*=-1; else {sortKey=k;sortDir=(k==="a"||k==="d")?-1:1} render()}));
+[fPac,fCon].forEach(s=>s.addEventListener("change",render)); fQ.addEventListener("input",render);
+$("#f-reset").addEventListener("click",()=>{fPac.value="";fCon.value="";fQ.value="";render()});
+function goTable(){document.getElementById("payments").scrollIntoView()}
+document.addEventListener("click",e=>{
+  const c=e.target.closest("[data-con]"); if(c){fCon.value=c.dataset.con;fPac.value="";fQ.value="";render();goTable();return}
+  const p=e.target.closest("[data-pac]"); if(p){fPac.value=p.dataset.pac;fCon.value="";fQ.value="";render();goTable()}
+});
+render();
+
+// nav highlight
+const links=[...document.querySelectorAll("#navlinks a")];
+try{
+  const io=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting){links.forEach(a=>a.classList.toggle("on",a.getAttribute("href")==="#"+en.target.id))}})},{rootMargin:"-30% 0px -60% 0px"});
+  document.querySelectorAll("main section").forEach(s=>io.observe(s));
+}catch(e){}
+</script>
